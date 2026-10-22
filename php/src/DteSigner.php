@@ -43,7 +43,7 @@ final class DteSigner
      * firmar <SetDTE> (misma mecánica, distinto elemento referenciado).
      * @throws RuntimeException Si el elemento no existe, no tiene atributo ID, o la firma con OpenSSL falla.
      */
-    public function signElement(DOMDocument $document, string $tagName, Certificate $certificate): DOMDocument
+    public function signElement(DOMDocument $document, string $tagName, Certificate $certificate, ?string $id = null): DOMDocument
     {
         // Se re-serializa y re-parsea el documento antes de firmarlo: así el
         // C14N que se firma es exactamente el que va a recalcular cualquiera
@@ -58,9 +58,17 @@ final class DteSigner
         $doc = new DOMDocument();
         $doc->loadXML($xml);
 
-        $target = $doc->getElementsByTagName($tagName)->item(0);
+        // Con $id se firma el elemento con ese ID (hay documentos con varios del mismo nombre, como los <Recibo> de un EnvioRecibos);
+        // sin $id, el primero. La firma queda como último hijo del padre del elemento firmado (<DTE>, <EnvioDTE>, <Cesion>, <AEC>...).
+        $target = null;
+        foreach ($doc->getElementsByTagName($tagName) as $candidato) {
+            if ($id === null || $candidato->getAttribute('ID') === $id) {
+                $target = $candidato;
+                break;
+            }
+        }
         if ($target === null) {
-            throw new RuntimeException("El documento no tiene un nodo <{$tagName}> para firmar.");
+            throw new RuntimeException("El documento no tiene un nodo <{$tagName}>" . ($id !== null ? " con ID {$id}" : '') . ' para firmar.');
         }
 
         $id = $target->getAttribute('ID');
@@ -70,12 +78,12 @@ final class DteSigner
 
         $digestValue = base64_encode(sha1($target->C14N(), true));
 
-        $this->buildSignature($doc, $id, $digestValue, $certificate);
+        $this->buildSignature($doc, $target->parentNode, $id, $digestValue, $certificate);
 
         return $doc;
     }
 
-    private function buildSignature(DOMDocument $doc, string $id, string $digestValue, Certificate $certificate): void
+    private function buildSignature(DOMDocument $doc, \DOMNode $parent, string $id, string $digestValue, Certificate $certificate): void
     {
         $ns = self::XMLDSIG_NAMESPACE;
 
@@ -86,7 +94,7 @@ final class DteSigner
         // C14N calculado acá no coincidiría con el que recalcula cualquier
         // verificador sobre el XML final, e invalidaría la firma.
         $signature = $doc->createElementNS($ns, 'Signature');
-        $doc->documentElement->appendChild($signature);
+        $parent->appendChild($signature);
 
         $signedInfo = $this->buildSignedInfo($doc, $id, $digestValue);
         $signature->appendChild($signedInfo);

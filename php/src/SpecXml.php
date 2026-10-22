@@ -119,7 +119,7 @@ final class SpecXml
     {
         $name = (string) $item['name'];
         $consumed[$name] = true;
-        if (isset($item['ref'])) { // p. ej. ds:Signature: lo agrega la firma, no los datos
+        if (isset($item['ref']) || $name === 'Signature') { // ds:Signature (referenciada o declarada en línea, como en LibroBoleta): la agrega la firma, no los datos
             if (array_key_exists($name, $data)) {
                 throw new InvalidArgumentException("«{$name}» ({$path}) no se entrega como dato: lo agrega la firma.");
             }

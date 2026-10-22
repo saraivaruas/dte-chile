@@ -127,7 +127,16 @@ function validaXsd(string $xmlBytes, string $xsd): void
     afirma($doc->loadXML($xmlBytes), 'El XML no se puede leer.');
     $usar = libxml_use_internal_errors(true);
     libxml_clear_errors();
-    $ok = $doc->schemaValidate(__DIR__ . '/../../schemas/' . $xsd);
+    // Algunos esquemas del SII traen límites de 34 dígitos (999...9) que libxml2 no acepta; se validan con una copia con el límite reducido.
+    $origen = dirname(__DIR__ . '/../../schemas/' . $xsd);
+    $tmp = sys_get_temp_dir() . '/xsd_' . bin2hex(random_bytes(4));
+    mkdir($tmp);
+    foreach (glob($origen . '/*.xsd') as $f) {
+        file_put_contents($tmp . '/' . basename($f), preg_replace('/9{19,}(\.9+)?/', '999999999999999', (string) file_get_contents($f)));
+    }
+    $ok = $doc->schemaValidate($tmp . '/' . basename($xsd));
+    array_map('unlink', glob($tmp . '/*') ?: []);
+    rmdir($tmp);
     $errores = array_map(static fn (\LibXMLError $e): string => 'línea ' . $e->line . ': ' . trim($e->message), array_slice(libxml_get_errors(), 0, 4));
     libxml_clear_errors();
     libxml_use_internal_errors($usar);
@@ -489,6 +498,11 @@ prueba('Esquema: los campos llegan en el orden que exige el SII aunque se entreg
     [$firmado] = dteFirmado($datos);
     validaXsd(bytes($firmado), 'dte/DTE_v10.xsd');
 });
+
+// ================================================================= pruebas de documentos adicionales (tests/casos/*.php)
+foreach (glob(__DIR__ . '/casos/*.php') ?: [] as $archivo) {
+    require $archivo;
+}
 
 // ================================================================= resultado
 $fallos = 0;

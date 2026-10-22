@@ -26,6 +26,9 @@ ESQUEMAS = [
     ("ic", "RespuestaEnvioDTE_v10.xsd", "respuesta_dte"),
     ("19983", "EnvioRecibos_v10.xsd", "envio_recibos"),
     ("19983", "Recibos_v10.xsd", "recibo"),
+    ("cesion", "AEC_v10.xsd", "aec"),
+    ("cesion", "DTECedido_v10.xsd", "dte_cedido"),
+    ("cesion", "Cesion_v10.xsd", "cesion"),
 ]
 SKIP = {"annotation", "documentation", "appinfo"}
 
@@ -171,6 +174,13 @@ def main() -> int:
         arbol["namespace"] = ET.parse(RAIZ / "schemas" / carpeta / archivo).getroot().get("targetNamespace")
         (salida / f"{nombre}.json").write_text(json.dumps(arbol, ensure_ascii=False, indent=1, sort_keys=False) + "\n", encoding="utf-8")
         print(f"spec/{nombre}.json  ({archivo})")
+        if nombre == "envio_boleta":
+            # La boleta no tiene un esquema DTE propio: su <DTE> está definido dentro de EnvioBOLETA. Se extrae como especificación independiente.
+            set_dte = next(c for c in arbol["children"] if c.get("name") == "SetDTE")
+            dte = next(c for c in set_dte["children"] if c.get("name") == "DTE")
+            dte = {**dte, "min": 1, "max": 1, "schema": arbol["schema"], "namespace": arbol["namespace"]}
+            (salida / "boleta.json").write_text(json.dumps(dte, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+            print("spec/boleta.json  (derivada de EnvioBOLETA)")
     # Copias que usan los paquetes (PHP y .NET las incluyen en su distribución); la fuente única es spec/.
     import shutil
     for destino in (RAIZ / "php" / "resources" / "spec", RAIZ / "dotnet" / "src" / "DteChile" / "Resources" / "spec"):

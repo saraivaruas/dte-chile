@@ -71,8 +71,10 @@ final class TedSigner
         $dd->appendChild(Xml::el($doc, 'TD', (string) $documentType));
         $dd->appendChild(Xml::el($doc, 'F', (string) $folio));
         $dd->appendChild(Xml::el($doc, 'FE', $data['fechaEmision']));
-        $dd->appendChild(Xml::el($doc, 'RR', Rut::toDteFormat($data['receptor']['rut'])));
-        $dd->appendChild(Xml::el($doc, 'RSR', $this->truncate((string) $data['receptor']['razonSocial'], 40)));
+        // En las boletas el receptor es opcional: sin RUT va el genérico 66666666-6 y sin nombre «Cliente».
+        $dd->appendChild(Xml::el($doc, 'RR', Rut::toDteFormat((string) ($data['receptor']['rut'] ?? BoletaBuilder::RUT_GENERICO))));
+        $razon = trim((string) ($data['receptor']['razonSocial'] ?? ''));
+        $dd->appendChild(Xml::el($doc, 'RSR', $this->truncate($razon !== '' ? $razon : 'Cliente', 40)));
         $dd->appendChild(Xml::el($doc, 'MNT', (string) $data['montoTotal']));
 
         $primerItem = (string) ($data['items'][0]['nombre'] ?? '');

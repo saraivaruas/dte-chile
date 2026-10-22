@@ -23,7 +23,6 @@ final class EnvioDteBuilder
 {
     private const NAMESPACE_URI = 'http://www.sii.cl/SiiDte';
     private const XSI_NAMESPACE = 'http://www.w3.org/2001/XMLSchema-instance';
-    private const SCHEMA_LOCATION = 'http://www.sii.cl/SiiDte EnvioDTE_v10.xsd';
 
     /** RUT genérico del SII — receptor de todo envío hecho directamente al SII (no a otro contribuyente). */
     private const SII_RUT = '60803000-K';
@@ -49,14 +48,38 @@ final class EnvioDteBuilder
      */
     public function build(array $signedDtes, array $caratula, Certificate $certificate): DOMDocument
     {
+        return $this->armar('EnvioDTE', 'EnvioDTE_v10.xsd', $signedDtes, $caratula, $certificate);
+    }
+
+    /**
+     * Igual que {@see build()}, pero para boletas (39 y 41): el SII las recibe en un `<EnvioBOLETA>` con su propio esquema (hasta 500 por envío).
+     *
+     * @param DOMDocument[] $signedBoletas Boletas firmadas (BoletaBuilder + TedSigner + DteSigner::sign()).
+     * @param array<string, mixed> $caratula Mismos datos que build().
+     */
+    public function buildBoleta(array $signedBoletas, array $caratula, Certificate $certificate): DOMDocument
+    {
+        foreach ($signedBoletas as $i => $b) {
+            $tipo = (int) ($b->getElementsByTagName('TipoDTE')->item(0)?->textContent ?? 0);
+            if (!DocumentType::isBoleta($tipo)) {
+                throw new InvalidArgumentException("El documento en la posición {$i} es de tipo {$tipo}: el EnvioBOLETA solo admite boletas (39 y 41).");
+            }
+        }
+
+        return $this->armar('EnvioBOLETA', 'EnvioBOLETA_v11.xsd', $signedBoletas, $caratula, $certificate);
+    }
+
+    /** @param DOMDocument[] $signedDtes @param array<string, mixed> $caratula */
+    private function armar(string $raiz, string $esquema, array $signedDtes, array $caratula, Certificate $certificate): DOMDocument
+    {
         if ($signedDtes === []) {
             throw new InvalidArgumentException('El envío debe contener al menos un DTE.');
         }
 
         $doc = new DOMDocument('1.0', 'ISO-8859-1');
 
-        $envioDte = $doc->createElementNS(self::NAMESPACE_URI, 'EnvioDTE');
-        $envioDte->setAttributeNS(self::XSI_NAMESPACE, 'xsi:schemaLocation', self::SCHEMA_LOCATION);
+        $envioDte = $doc->createElementNS(self::NAMESPACE_URI, $raiz);
+        $envioDte->setAttributeNS(self::XSI_NAMESPACE, 'xsi:schemaLocation', 'http://www.sii.cl/SiiDte ' . $esquema);
         $envioDte->setAttribute('version', '1.0');
         $doc->appendChild($envioDte);
 
