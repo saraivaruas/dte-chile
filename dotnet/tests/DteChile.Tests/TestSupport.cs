@@ -91,8 +91,17 @@ public static class Verify
     /// <summary>Valida el XML contra un esquema oficial del SII; si no cumple, lanza con los primeros problemas.</summary>
     public static void Xsd(byte[] xml, string xsd, string ns = "http://www.sii.cl/SiiDte")
     {
+        // Algunos esquemas del SII traen límites de 34 dígitos (999...9) que .NET no acepta; se validan con una copia con el límite reducido.
+        var origen = Path.GetDirectoryName(Path.Combine(RepoRoot(), "schemas", xsd))!;
+        var tmp = Path.Combine(Path.GetTempPath(), "xsd_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tmp);
+        foreach (var f in Directory.GetFiles(origen, "*.xsd"))
+        {
+            File.WriteAllBytes(Path.Combine(tmp, Path.GetFileName(f)), Encoding.Latin1.GetBytes(Regex.Replace(Encoding.Latin1.GetString(File.ReadAllBytes(f)), @"9{19,}(\.9+)?", "999999999999999")));
+        }
+
         var set = new XmlSchemaSet { XmlResolver = new XmlUrlResolver() };
-        set.Add(ns, Path.Combine(RepoRoot(), "schemas", xsd));
+        set.Add(ns, Path.Combine(tmp, Path.GetFileName(xsd)));
         var errores = new List<string>();
         var settings = new XmlReaderSettings { ValidationType = ValidationType.Schema, Schemas = set, DtdProcessing = DtdProcessing.Prohibit };
         settings.ValidationEventHandler += (_, e) => errores.Add($"línea {e.Exception?.LineNumber}: {e.Message}");

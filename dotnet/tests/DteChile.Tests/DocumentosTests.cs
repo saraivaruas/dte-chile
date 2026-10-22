@@ -198,3 +198,15 @@ public class DocumentosTests
         Assert.Equal(4, Verify.XmlDsig(Pipeline.Bytes(doc), cert.CertificatePem)); // Documento del DTE, DTE cedido, cesión y AEC
     }
 }
+
+public class ReglasPorTipoTests
+{
+    [Fact]
+    public void La_nota_de_credito_exige_referencia_y_la_guia_de_despacho_el_tipo_de_traslado()
+    {
+        Assert.Contains("referencia", Assert.Throws<ArgumentException>(() => new DteBuilder().Build(61, Fixtures.Factura())).Message);
+        Assert.Contains("tipo de traslado", Assert.Throws<ArgumentException>(() => new DteBuilder().Build(52, Fixtures.Factura())).Message);
+        new DteBuilder().Build(61, Fixtures.Factura(cambios: d => d["referencias"] = B.L(B.M(("tipoDocumento", 33), ("folio", 7), ("fecha", "2026-09-08"), ("codigo", 1), ("razon", "Anula factura")))));
+        new DteBuilder().Build(52, Fixtures.Factura(cambios: d => d["indicadorTraslado"] = 1));
+    }
+}

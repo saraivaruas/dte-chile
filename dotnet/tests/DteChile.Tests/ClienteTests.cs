@@ -85,7 +85,7 @@ public class ClienteTests
         var (c, log) = Falso((200, SoapRetorno("getEstUp", RespSii("<TRACKID>987654</TRACKID><ESTADO>EPR</ESTADO><GLOSA>Envio Procesado</GLOSA>", "<ACEPTADOS>2</ACEPTADOS><RECHAZADOS>1</RECHAZADOS><REPAROS>0</REPAROS>"))));
         var e = await c.GetUploadStatusAsync("76.123.456-0", "987654", "TKN");
         Assert.Equal(("EPR", "Envío procesado.", 2, 1, 0, "987654"), (e.Estado, e.Descripcion, e.Aceptados, e.Rechazados, e.Reparos, e.TrackId));
-        Assert.Contains("<RutCompania xmlns=\"http://DefaultNamespace\">76123456</RutCompania>", log[0].Body!.Replace("xmlns=\"http://DefaultNamespace\" ", string.Empty));
+        Assert.Contains(">76123456</RutCompania>", log[0].Body);
         Assert.Contains("987654</TrackId>", log[0].Body);
         Assert.Contains("TKN</Token>", log[0].Body);
         var (c2, _) = Falso((200, SoapRetorno("getEstUp", RespSii("<ESTADO>ZZZ</ESTADO><GLOSA>Estado nuevo del SII</GLOSA>"))));

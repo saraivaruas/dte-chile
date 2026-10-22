@@ -89,6 +89,14 @@ final class DteBuilder
         }
         $variante = $this->variante($documentType);
         $this->validate($data);
+        // Reglas del formato del SII que el esquema no expresa: las notas de crédito y débito deben referenciar el documento que modifican,
+        // y la guía de despacho debe indicar el tipo de traslado.
+        if (in_array($documentType, [DocumentType::NOTA_DEBITO, DocumentType::NOTA_CREDITO, DocumentType::NOTA_DEBITO_EXPORTACION, DocumentType::NOTA_CREDITO_EXPORTACION], true) && empty($data['referencias'])) {
+            throw new InvalidArgumentException('Las notas de crédito y de débito deben incluir al menos una referencia («referencias») al documento que corrigen o anulan.');
+        }
+        if ($documentType === DocumentType::GUIA_DESPACHO && !isset($data['indicadorTraslado']) && !isset($data['idDoc']['IndTraslado'])) {
+            throw new InvalidArgumentException('La guía de despacho debe indicar el tipo de traslado («indicadorTraslado», 1 a 9).');
+        }
 
         $emisor = $this->alias((array) $data['emisor'], self::ALIAS_EMISOR);
         $emisor['RUTEmisor'] = Rut::toDteFormat((string) $emisor['RUTEmisor']);

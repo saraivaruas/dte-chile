@@ -52,7 +52,7 @@ public sealed partial class TedSigner
         dd.AppendChild(El(doc, "F", folio.ToString(CultureInfo.InvariantCulture)));
         dd.AppendChild(El(doc, "FE", Convert.ToString(data["fechaEmision"], CultureInfo.InvariantCulture)!));
         // En las boletas el receptor es opcional: sin RUT va el genérico 66666666-6 y sin nombre «Cliente».
-        dd.AppendChild(El(doc, "RR", Rut.ToDteFormat(Convert.ToString(Pick(receptor, "rut", "RUTRecep"), CultureInfo.InvariantCulture) ?? BoletaBuilder.RutGenerico)));
+        dd.AppendChild(El(doc, "RR", Rut.ToDteFormat(Pick(receptor, "rut", "RUTRecep") is { } rutRecep && Convert.ToString(rutRecep, CultureInfo.InvariantCulture) is { Length: > 0 } rr ? rr : BoletaBuilder.RutGenerico)));
         var razon = (Convert.ToString(Pick(receptor, "razonSocial", "RznSocRecep"), CultureInfo.InvariantCulture) ?? string.Empty).Trim();
         dd.AppendChild(El(doc, "RSR", Cut(razon.Length > 0 ? razon : "Cliente", 40)));
         dd.AppendChild(El(doc, "MNT", Convert.ToString(data["montoTotal"], CultureInfo.InvariantCulture)!));

@@ -91,6 +91,18 @@ public sealed class DteBuilder
 
         var variante = Variante(documentType);
         Validate(data);
+        // Reglas del formato del SII que el esquema no expresa: las notas de crédito y débito deben referenciar el documento que modifican,
+        // y la guía de despacho debe indicar el tipo de traslado.
+        if (documentType is DocumentType.NotaDebito or DocumentType.NotaCredito or DocumentType.NotaDebitoExportacion or DocumentType.NotaCreditoExportacion
+            && !(data.TryGetValue("referencias", out var refsReq) && SpecXml.AsList(refsReq) is { Count: > 0 }))
+        {
+            throw new ArgumentException("Las notas de crédito y de débito deben incluir al menos una referencia («referencias») al documento que corrigen o anulan.");
+        }
+
+        if (documentType == DocumentType.GuiaDespacho && !data.ContainsKey("indicadorTraslado") && !(data.TryGetValue("idDoc", out var idd) && SpecXml.AsMap(idd) is { } iddm && iddm.ContainsKey("IndTraslado")))
+        {
+            throw new ArgumentException("La guía de despacho debe indicar el tipo de traslado («indicadorTraslado», 1 a 9).");
+        }
 
         var emisor = Alias(SpecXml.AsMap(data["emisor"])!, AliasEmisor);
         emisor["RUTEmisor"] = Rut.ToDteFormat(Convert.ToString(emisor["RUTEmisor"], CultureInfo.InvariantCulture)!);

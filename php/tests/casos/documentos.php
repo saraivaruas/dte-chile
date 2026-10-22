@@ -95,3 +95,9 @@ prueba('Cesión de factura (AEC): el DTE, la cesión y el archivo quedan firmado
     validaXsd(bytes($doc), 'cesion/AEC_v10.xsd');
     igual(4, verificaXmlDsig(bytes($doc), $cert->certificatePem()), 'firmas (Documento del DTE, DTE cedido, cesión y AEC)');
 });
+prueba('Reglas por tipo: la nota de crédito exige referencia y la guía de despacho el tipo de traslado', function (): void {
+    lanza(fn () => (new \IngeInnova\DteChile\DteBuilder())->build(61, Fixtures::datosFactura()), 'referencia');
+    lanza(fn () => (new \IngeInnova\DteChile\DteBuilder())->build(52, Fixtures::datosFactura()), 'tipo de traslado');
+    (new \IngeInnova\DteChile\DteBuilder())->build(61, Fixtures::datosFactura(1, ['referencias' => [['tipoDocumento' => 33, 'folio' => 7, 'fecha' => '2026-09-08', 'codigo' => 1, 'razon' => 'Anula factura']]]));
+    (new \IngeInnova\DteChile\DteBuilder())->build(52, Fixtures::datosFactura(1, ['indicadorTraslado' => 1]));
+});
