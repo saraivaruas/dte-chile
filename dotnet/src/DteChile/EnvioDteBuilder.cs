@@ -18,7 +18,6 @@ public sealed record Caratula(string RutEmisor, string RutEnvia, string FechaRes
 public sealed class EnvioDteBuilder
 {
     private const string Xsi = "http://www.w3.org/2001/XMLSchema-instance";
-    private const string SchemaLocation = "http://www.sii.cl/SiiDte EnvioDTE_v10.xsd";
 
     /// <summary>RUT genérico del SII: receptor de todo envío hecho directamente al SII (no a otro contribuyente).</summary>
     private const string SiiRut = "60803000-K";
@@ -29,6 +28,27 @@ public sealed class EnvioDteBuilder
 
     /// <exception cref="ArgumentException">Si no se recibe ningún DTE, o alguno no tiene la forma esperada.</exception>
     public XmlDocument Build(IReadOnlyList<XmlDocument> signedDtes, Caratula caratula, Certificate certificate)
+        => Armar("EnvioDTE", "envio_dte", "EnvioDTE_v10.xsd", signedDtes, caratula, certificate);
+
+    /// <summary>
+    /// Igual que <see cref="Build"/>, pero para boletas (39 y 41): el SII las recibe en un <c>&lt;EnvioBOLETA&gt;</c> con su propio esquema (hasta 500 por envío).
+    /// </summary>
+    /// <exception cref="ArgumentException">Si algún documento no es una boleta.</exception>
+    public XmlDocument BuildBoleta(IReadOnlyList<XmlDocument> signedBoletas, Caratula caratula, Certificate certificate)
+    {
+        for (var i = 0; i < signedBoletas.Count; i++)
+        {
+            var tipo = signedBoletas[i].GetElementsByTagName("TipoDTE") is { Count: > 0 } n ? int.Parse(n[0]!.InnerText, CultureInfo.InvariantCulture) : 0;
+            if (!DocumentType.IsBoleta(tipo))
+            {
+                throw new ArgumentException($"El documento en la posición {i} es de tipo {tipo}: el EnvioBOLETA solo admite boletas (39 y 41).");
+            }
+        }
+
+        return Armar("EnvioBOLETA", "envio_boleta", "EnvioBOLETA_v11.xsd", signedBoletas, caratula, certificate);
+    }
+
+    private XmlDocument Armar(string raizNombre, string spec, string esquema, IReadOnlyList<XmlDocument> signedDtes, Caratula caratula, Certificate certificate)
     {
         if (signedDtes.Count == 0)
         {
@@ -75,11 +95,11 @@ public sealed class EnvioDteBuilder
         var xml = new SpecXml(DteBuilder.NamespaceUri, ["DTE", "Signature"]);
         var raiz = xml.Element(
             doc,
-            Spec.Load("envio_dte"),
+            Spec.Load(spec),
             new Dictionary<string, object?> { ["@version"] = "1.0", ["SetDTE"] = new Dictionary<string, object?> { ["@ID"] = "SetDoc", ["Caratula"] = carat } },
-            "EnvioDTE");
+            raizNombre);
         var schemaLocation = doc.CreateAttribute("xsi", "schemaLocation", Xsi);
-        schemaLocation.Value = SchemaLocation;
+        schemaLocation.Value = "http://www.sii.cl/SiiDte " + esquema;
         raiz.SetAttributeNode(schemaLocation);
         doc.AppendChild(raiz);
 

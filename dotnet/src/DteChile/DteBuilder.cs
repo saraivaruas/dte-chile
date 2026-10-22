@@ -363,7 +363,7 @@ public sealed class DteBuilder
     }
 
     /// <summary>Cambia los nombres amigables por los del SII; una clave que ya es un nombre del SII pasa tal cual. Un valor nulo o vacío se omite.</summary>
-    private static Dictionary<string, object?> Alias(IDictionary<string, object?> input, IReadOnlyDictionary<string, string> map)
+    internal static Dictionary<string, object?> Alias(IDictionary<string, object?> input, IReadOnlyDictionary<string, string> map)
     {
         var r = new Dictionary<string, object?>(StringComparer.Ordinal);
         foreach (var (k, v) in input)

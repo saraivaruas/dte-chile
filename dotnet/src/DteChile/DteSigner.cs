@@ -31,21 +31,23 @@ public sealed class DteSigner
     }
 
     /// <summary>Firma XMLDSig cualquier elemento identificado por nombre de etiqueta y atributo ID (lo usa también el sobre de envío para firmar el <c>SetDTE</c>).</summary>
-    public XmlDocument SignElement(XmlDocument document, string tagName, Certificate certificate)
+    public XmlDocument SignElement(XmlDocument document, string tagName, Certificate certificate, string? id = null)
     {
         // Se re-serializa y re-lee el documento antes de firmarlo: así la canonicalización que se firma es exactamente la que recalculará quien reciba los bytes
         // finales (el SII incluido), sin depender de cómo quedó armado el árbol en memoria.
         var doc = XmlIo.Reparse(document);
-        var target = doc.GetElementsByTagName(tagName).Cast<XmlElement>().FirstOrDefault()
-            ?? throw new InvalidOperationException($"El documento no tiene un nodo <{tagName}> para firmar.");
-        var id = target.GetAttribute("ID");
+        // Con id se firma el elemento con ese ID (hay documentos con varios del mismo nombre, como los <Recibo> de un EnvioRecibos); sin id, el primero.
+        // La firma queda como último hijo del padre del elemento firmado (<DTE>, <EnvioDTE>, <Cesion>, <AEC>...).
+        var target = doc.GetElementsByTagName(tagName).Cast<XmlElement>().FirstOrDefault(e => id is null || e.GetAttribute("ID") == id)
+            ?? throw new InvalidOperationException($"El documento no tiene un nodo <{tagName}>" + (id is null ? string.Empty : $" con ID {id}") + " para firmar.");
+        id = target.GetAttribute("ID");
         if (id.Length == 0)
         {
             throw new InvalidOperationException($"El nodo <{tagName}> no tiene atributo ID — no se puede referenciar desde la firma.");
         }
 
         var digest = Convert.ToBase64String(SHA1.HashData(C14n.CanonicalizeBytes(target)));
-        BuildSignature(doc, doc.DocumentElement!, "#" + id, digest, certificate, [C14nAlgorithm]);
+        BuildSignature(doc, (XmlElement)target.ParentNode!, "#" + id, digest, certificate, [C14nAlgorithm]);
 
         return doc;
     }

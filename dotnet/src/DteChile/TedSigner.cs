@@ -44,15 +44,17 @@ public sealed partial class TedSigner
     private static XmlElement BuildDd(XmlDocument doc, int documentType, int folio, Caf caf, IDictionary<string, object?> data)
     {
         var emisor = SpecXml.AsMap(data["emisor"])!;
-        var receptor = SpecXml.AsMap(data["receptor"])!;
+        var receptor = data.TryGetValue("receptor", out var recep) && SpecXml.AsMap(recep) is { } rm ? rm : new Dictionary<string, object?>();
         var dd = doc.CreateElement("DD");
 
         dd.AppendChild(El(doc, "RE", Rut.ToDteFormat(Convert.ToString(Pick(emisor, "rut", "RUTEmisor"), CultureInfo.InvariantCulture)!)));
         dd.AppendChild(El(doc, "TD", documentType.ToString(CultureInfo.InvariantCulture)));
         dd.AppendChild(El(doc, "F", folio.ToString(CultureInfo.InvariantCulture)));
         dd.AppendChild(El(doc, "FE", Convert.ToString(data["fechaEmision"], CultureInfo.InvariantCulture)!));
-        dd.AppendChild(El(doc, "RR", Rut.ToDteFormat(Convert.ToString(Pick(receptor, "rut", "RUTRecep"), CultureInfo.InvariantCulture)!)));
-        dd.AppendChild(El(doc, "RSR", Cut(Convert.ToString(Pick(receptor, "razonSocial", "RznSocRecep"), CultureInfo.InvariantCulture) ?? string.Empty, 40)));
+        // En las boletas el receptor es opcional: sin RUT va el genérico 66666666-6 y sin nombre «Cliente».
+        dd.AppendChild(El(doc, "RR", Rut.ToDteFormat(Convert.ToString(Pick(receptor, "rut", "RUTRecep"), CultureInfo.InvariantCulture) ?? BoletaBuilder.RutGenerico)));
+        var razon = (Convert.ToString(Pick(receptor, "razonSocial", "RznSocRecep"), CultureInfo.InvariantCulture) ?? string.Empty).Trim();
+        dd.AppendChild(El(doc, "RSR", Cut(razon.Length > 0 ? razon : "Cliente", 40)));
         dd.AppendChild(El(doc, "MNT", Convert.ToString(data["montoTotal"], CultureInfo.InvariantCulture)!));
 
         var items = SpecXml.AsList(data["items"]);

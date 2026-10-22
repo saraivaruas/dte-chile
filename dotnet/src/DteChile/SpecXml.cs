@@ -125,7 +125,7 @@ public sealed class SpecXml
     {
         var name = item.Name;
         consumed.Add(name);
-        if (item.Ref is not null)
+        if (item.Ref is not null || name == "Signature") // ds:Signature (referenciada o declarada en línea, como en LibroBoleta): la agrega la firma, no los datos
         {
             if (data.ContainsKey(name))
             {
