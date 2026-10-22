@@ -18,13 +18,22 @@
        "min": 1,
        "max": 1,
        "type": {
-        "base": "RUTType"
+        "base": "string",
+        "maxLength": 10,
+        "minLength": 3,
+        "pattern": "[0-9]+-([0-9]|K)"
        }
       },
       {
        "name": "RutRecibe",
        "min": 1,
-       "max": 1
+       "max": 1,
+       "type": {
+        "base": "string",
+        "maxLength": 10,
+        "minLength": 3,
+        "pattern": "[0-9]+-([0-9]|K)"
+       }
       },
       {
        "name": "IdRespuesta",
@@ -47,17 +56,29 @@
       {
        "name": "NmbContacto",
        "min": 0,
-       "max": 1
+       "max": 1,
+       "type": {
+        "base": "string",
+        "maxLength": 40
+       }
       },
       {
        "name": "FonoContacto",
        "min": 0,
-       "max": 1
+       "max": 1,
+       "type": {
+        "base": "string",
+        "maxLength": 40
+       }
       },
       {
        "name": "MailContacto",
        "min": 0,
-       "max": 1
+       "max": 1,
+       "type": {
+        "base": "string",
+        "maxLength": 80
+       }
       },
       {
        "name": "TmstFirmaResp",
@@ -132,12 +153,24 @@
         {
          "name": "RutEmisor",
          "min": 0,
-         "max": 1
+         "max": 1,
+         "type": {
+          "base": "string",
+          "maxLength": 10,
+          "minLength": 3,
+          "pattern": "[0-9]+-([0-9]|K)"
+         }
         },
         {
          "name": "RutReceptor",
          "min": 0,
-         "max": 1
+         "max": 1,
+         "type": {
+          "base": "string",
+          "maxLength": 10,
+          "minLength": 3,
+          "pattern": "[0-9]+-([0-9]|K)"
+         }
         },
         {
          "name": "EstadoRecepEnv",
@@ -183,12 +216,27 @@
           {
            "name": "TipoDTE",
            "min": 1,
-           "max": 1
+           "max": 1,
+           "type": {
+            "base": "positiveInteger",
+            "enum": [
+             "33",
+             "34",
+             "46",
+             "52",
+             "56",
+             "61"
+            ]
+           }
           },
           {
            "name": "Folio",
            "min": 1,
-           "max": 1
+           "max": 1,
+           "type": {
+            "base": "positiveInteger",
+            "totalDigits": 10
+           }
           },
           {
            "name": "FchEmis",
@@ -201,17 +249,33 @@
           {
            "name": "RUTEmisor",
            "min": 1,
-           "max": 1
+           "max": 1,
+           "type": {
+            "base": "string",
+            "maxLength": 10,
+            "minLength": 3,
+            "pattern": "[0-9]+-([0-9]|K)"
+           }
           },
           {
            "name": "RUTRecep",
            "min": 1,
-           "max": 1
+           "max": 1,
+           "type": {
+            "base": "string",
+            "maxLength": 10,
+            "minLength": 3,
+            "pattern": "[0-9]+-([0-9]|K)"
+           }
           },
           {
            "name": "MntTotal",
            "min": 1,
-           "max": 1
+           "max": 1,
+           "type": {
+            "base": "nonNegativeInteger",
+            "totalDigits": 18
+           }
           },
           {
            "name": "EstadoRecepDTE",
@@ -251,12 +315,27 @@
         {
          "name": "TipoDTE",
          "min": 1,
-         "max": 1
+         "max": 1,
+         "type": {
+          "base": "positiveInteger",
+          "enum": [
+           "33",
+           "34",
+           "46",
+           "52",
+           "56",
+           "61"
+          ]
+         }
         },
         {
          "name": "Folio",
          "min": 1,
-         "max": 1
+         "max": 1,
+         "type": {
+          "base": "positiveInteger",
+          "totalDigits": 10
+         }
         },
         {
          "name": "FchEmis",
@@ -269,17 +348,33 @@
         {
          "name": "RUTEmisor",
          "min": 1,
-         "max": 1
+         "max": 1,
+         "type": {
+          "base": "string",
+          "maxLength": 10,
+          "minLength": 3,
+          "pattern": "[0-9]+-([0-9]|K)"
+         }
         },
         {
          "name": "RUTRecep",
          "min": 1,
-         "max": 1
+         "max": 1,
+         "type": {
+          "base": "string",
+          "maxLength": 10,
+          "minLength": 3,
+          "pattern": "[0-9]+-([0-9]|K)"
+         }
         },
         {
          "name": "MntTotal",
          "min": 1,
-         "max": 1
+         "max": 1,
+         "type": {
+          "base": "nonNegativeInteger",
+          "totalDigits": 18
+         }
         },
         {
          "name": "CodEnvio",

@@ -16,12 +16,24 @@
       {
        "name": "RutEmisor",
        "min": 1,
-       "max": 1
+       "max": 1,
+       "type": {
+        "base": "string",
+        "maxLength": 10,
+        "minLength": 3,
+        "pattern": "[0-9]+-([0-9]|K)"
+       }
       },
       {
        "name": "RutEnvia",
        "min": 1,
-       "max": 1
+       "max": 1,
+       "type": {
+        "base": "string",
+        "maxLength": 10,
+        "minLength": 3,
+        "pattern": "[0-9]+-([0-9]|K)"
+       }
       },
       {
        "name": "FchResol",
@@ -34,7 +46,11 @@
       {
        "name": "NroResol",
        "min": 1,
-       "max": 1
+       "max": 1,
+       "type": {
+        "base": "nonNegativeInteger",
+        "totalDigits": 6
+       }
       },
       {
        "name": "FchInicio",
@@ -111,27 +127,50 @@
       {
        "name": "MntNeto",
        "min": 0,
-       "max": 1
+       "max": 1,
+       "type": {
+        "base": "nonNegativeInteger",
+        "totalDigits": 18
+       }
       },
       {
        "name": "MntIva",
        "min": 0,
-       "max": 1
+       "max": 1,
+       "type": {
+        "base": "nonNegativeInteger",
+        "totalDigits": 18
+       }
       },
       {
        "name": "TasaIVA",
        "min": 0,
-       "max": 1
+       "max": 1,
+       "type": {
+        "base": "decimal",
+        "totalDigits": 5,
+        "fractionDigits": 2,
+        "minInclusive": "0.01",
+        "maxInclusive": "999.99"
+       }
       },
       {
        "name": "MntExento",
        "min": 0,
-       "max": 1
+       "max": 1,
+       "type": {
+        "base": "nonNegativeInteger",
+        "totalDigits": 18
+       }
       },
       {
        "name": "MntTotal",
        "min": 1,
-       "max": 1
+       "max": 1,
+       "type": {
+        "base": "nonNegativeInteger",
+        "totalDigits": 18
+       }
       },
       {
        "name": "FoliosEmitidos",
@@ -168,12 +207,20 @@
         {
          "name": "Inicial",
          "min": 1,
-         "max": 1
+         "max": 1,
+         "type": {
+          "base": "positiveInteger",
+          "totalDigits": 10
+         }
         },
         {
          "name": "Final",
          "min": 1,
-         "max": 1
+         "max": 1,
+         "type": {
+          "base": "positiveInteger",
+          "totalDigits": 10
+         }
         }
        ]
       },
@@ -185,12 +232,20 @@
         {
          "name": "Inicial",
          "min": 1,
-         "max": 1
+         "max": 1,
+         "type": {
+          "base": "positiveInteger",
+          "totalDigits": 10
+         }
         },
         {
          "name": "Final",
          "min": 0,
-         "max": 1
+         "max": 1,
+         "type": {
+          "base": "positiveInteger",
+          "totalDigits": 10
+         }
         }
        ]
       }
