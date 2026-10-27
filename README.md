@@ -25,7 +25,7 @@ paquetes de terceros.
 | Firma XMLDSig del documento y del envío (`EnvioDTE`, `EnvioBOLETA`) | ✔ | ✔ |
 | Libros de compra/venta, de guías y de boletas; consumo de folios (RCOF) | ✔ | ✔ |
 | Respuestas de intercambio, recibos (Ley 19.983), cesión de facturas (AEC) | ✔ | ✔ |
-| Autenticación (semilla/token), envío y consulta de estado (DTE y boletas) | ✔ |
+| Autenticación (semilla/token), envío y consulta de estado (DTE y boletas) | ✔ | ✔ |
 | Representación impresa en PDF (Carta) con el timbre PDF417 | ✔ | ✔ |
 
 Reglas del formato que el esquema no expresa también se validan: las notas de crédito y débito exigen referencia, la guía de despacho exige el tipo de
