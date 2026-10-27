@@ -33,7 +33,7 @@ traslado, los textos se restringen a ISO-8859-1 (lo que exige el SII) con mensaj
 
 ## Qué **no** hace (todavía)
 
-- Genera la **representación impresa en PDF** con el timbre PDF417, pero no incluye interfaz, base de datos, logotipo ni administración de clientes: se integra en su sistema. El avance de folios se guarda en un archivo (`ArchivoFolios`) o en su propia base de datos (`FolioStore`).
+- No incluye interfaz, base de datos, logotipo en el PDF ni administración de clientes: se integra en su sistema. El avance de folios se guarda en un archivo (`ArchivoFolios`) o en su propia base de datos (`FolioStore`).
 - No implementa el registro de compras y ventas (RCV) en línea ni el envío de correos de intercambio.
 - No cubre casos especiales que requieren el bloque `totales` explícito (por ejemplo liquidación-factura, margen de comercialización).
 - El envío de documentos con folios reales no está probado contra el SII (falta un CAF de certificación); la autenticación, los esquemas y las firmas sí están verificados.
