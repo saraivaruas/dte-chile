@@ -52,6 +52,12 @@ final class Facturador
         return $this;
     }
 
+    /** Tipos de documento para los que hay un CAF cargado. @return int[] */
+    public function tiposDisponibles(): array
+    {
+        return array_keys($this->cafs);
+    }
+
     /** @param Linea[] $lineas */
     public function factura(Receptor $receptor, array $lineas, array $opciones = []): DocumentoEmitido
     {

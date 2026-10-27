@@ -1,0 +1,41 @@
+name: Sync repos
+# El monorepo es la fuente canónica. Cada vez que cambia main (o se sube una etiqueta), copia su contenido a los repos de distribución:
+#   saraivaruas/dte-chile-php    -> contenido de php/ más un composer.json en la raíz (Packagist lo exige ahí), documentación, esquemas y spec
+#   saraivaruas/dte-chile-dotnet -> dotnet/ más documentación, esquemas y spec
+# Requiere el secreto SYNC_TOKEN: un token de GitHub con permiso de escritura en esos dos repos.
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+jobs:
+  sync:
+    if: github.repository == 'saraivaruas/dte-chile'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        destino: [php, dotnet]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Armar la copia
+        run: |
+          mkdir out
+          cp -r schemas spec tools docs LICENSE README.md CHANGELOG.md CONTRIBUTING.md SECURITY.md out/
+          mkdir -p out/.github/workflows
+          cp .github/dist/ci-${{ matrix.destino }}.yml out/.github/workflows/ci.yml
+          if [ "${{ matrix.destino }}" = php ]; then cp -r php out/php; cp .github/dist/composer.root.json out/composer.json; else cp -r dotnet out/dotnet; fi
+      - name: Subir al repo de distribución
+        env:
+          SYNC_TOKEN: ${{ secrets.SYNC_TOKEN }}
+        run: |
+          [ -n "$SYNC_TOKEN" ] || { echo "Sin SYNC_TOKEN: no se sincroniza."; exit 0; }
+          DEST="dte-chile-${{ matrix.destino }}"
+          git clone "https://x-access-token:${SYNC_TOKEN}@github.com/saraivaruas/${DEST}.git" dest
+          find dest -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -r out/. dest/
+          cd dest
+          git config user.name "dte-chile-sync"; git config user.email "sync@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && { echo "Sin cambios."; exit 0; }
+          git commit -m "Sincroniza desde saraivaruas/dte-chile@${GITHUB_SHA::7}"
+          git push
+          if [ "${GITHUB_REF_TYPE}" = tag ]; then git tag -f "${GITHUB_REF_NAME}" && git push -f origin "${GITHUB_REF_NAME}"; fi

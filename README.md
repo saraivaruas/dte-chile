@@ -33,12 +33,50 @@ traslado, los textos se restringen a ISO-8859-1 (lo que exige el SII) con mensaj
 
 ## Qué **no** hace (todavía)
 
-- No genera la representación impresa (PDF/PDF417) ni incluye interfaz, base de datos o administración de clientes y folios: se integra en su sistema.
+- Genera el timbre como código **PDF417** (SVG), pero no arma el PDF de la representación impresa ni incluye interfaz, base de datos o administración de clientes: se integra en su sistema. El avance de folios se guarda en un archivo (`ArchivoFolios`) o en su propia base de datos (`FolioStore`).
 - No implementa el registro de compras y ventas (RCV) en línea ni el envío de correos de intercambio.
 - No cubre casos especiales que requieren el bloque `totales` explícito (por ejemplo liquidación-factura, margen de comercialización).
 - No hay verificación contra el SII real de todos los documentos de la lista anterior; los esquemas y las firmas sí están verificados.
 
-## Uso rápido (PHP)
+## Uso rápido (PHP) — alto nivel
+
+```php
+use IngeInnova\DteChile\{ArchivoFolios, Caf, Certificate, Emisor, Facturador, Linea, Receptor, SiiClient};
+
+$f = new Facturador(
+    new Emisor('76.123.456-0', 'Mi Empresa SpA', 'Servicios de ingeniería', 711001, 'Av. Siempre Viva 123', 'Providencia', 'Santiago'),
+    Certificate::fromPkcs12(file_get_contents('certificado.pfx'), $clave),
+    new ArchivoFolios('folios.json'),
+    SiiClient::CERTIFICACION,
+);
+$f->agregarCaf(Caf::fromXml(file_get_contents('CAF33.xml')));
+
+$doc = $f->factura(new Receptor('77.111.222-6', 'Cliente Ltda'), [new Linea('Consultoría técnica', 10, 25000)]);
+$envio = $f->enviar([$doc]);                       // arma el sobre, lo firma y lo sube al SII
+$estado = $f->estadoEnvio($envio->trackId);
+```
+
+Factura, exenta, notas de crédito y débito, guías y boletas: ver la [guía por tipo de documento](docs/guia.md) y los [ejemplos](php/examples).
+
+## Uso rápido (C#) — alto nivel
+
+```csharp
+var f = new Facturador(
+    new Emisor("76.123.456-0", "Mi Empresa SpA", "Servicios de ingeniería", 711001, "Av. Siempre Viva 123", "Providencia", "Santiago"),
+    Certificate.FromPkcs12(File.ReadAllBytes("certificado.pfx"), clave),
+    new ArchivoFolios("folios.json"));
+f.AgregarCaf(Caf.FromXml(File.ReadAllText("CAF33.xml")));
+
+var doc = f.Factura(new Receptor("77.111.222-6", "Cliente Ltda"), [new Linea("Consultoría técnica", 10, 25000)]);
+var envio = await f.EnviarAsync([doc]);
+var estado = await f.EstadoEnvioAsync(envio.TrackId);
+```
+
+## Capa baja (control total)
+
+Para casos especiales (liquidación-factura, bloques con nombres del SII, flujos propios) puede usar directamente las clases que usa la fachada.
+
+### Capa baja en PHP
 
 ```php
 use IngeInnova\DteChile\{Caf, Certificate, DteBuilder, TedSigner, DteSigner, EnvioDteBuilder, SiiClient};
@@ -58,7 +96,7 @@ $resultado = $sii->uploadEnvioDte($envio, $token, '11111111-1', '76123456-0');  
 $estado = $sii->getUploadStatus('76123456-0', $resultado['trackId'], $token);
 ```
 
-## Uso rápido (C#)
+### Capa baja en C#
 
 ```csharp
 var cert = Certificate.FromPkcs12(File.ReadAllBytes("certificado.pfx"), clave);
@@ -100,8 +138,12 @@ montos) y se actualizará a medida que el SII publique las fases. Si el SII publ
 
 ## Instalación
 
-- PHP: `composer require ingeinnova/dte-chile` (cuando se publique en Packagist) o copiar `php/src` y `php/resources`.
+- PHP: `composer require saraivaruas/dte-chile` (cuando se publique en Packagist) o copiar `php/src` y `php/resources`.
 - C#: paquete NuGet `DteChile` (cuando se publique) o referenciar `dotnet/src/DteChile`.
+
+## Estado de la certificación con el SII
+
+Hoy la biblioteca **no cuenta con una certificación documentada ante el SII**: las pruebas automáticas usan un certificado y un CAF falsos. El proceso de certificación del SII (su set de pruebas, simulación y declaración) lo debe superar cada emisor con su propio certificado y folios; la [guía](docs/guia.md) explica cómo usar `php/examples/certificacion.php` para ese proceso. Cuando exista una certificación aprobada con un emisor real, se documentará aquí.
 
 ## Contribuir y seguridad
 
