@@ -14,6 +14,8 @@ paquetes de terceros.
 >   impuestos adicionales y retenciones las debe indicar quien usa la biblioteca, porque cambian por ley.
 > - Se entrega «tal cual», sin garantía (ver [LICENSE](LICENSE)). Usted es responsable de lo que emite.
 
+![Flujo de dte-chile: datos, XML y totales, timbre, firma y envío al SII](docs/flujo.svg)
+
 ## Qué hace
 
 | Función | PHP | C# |
