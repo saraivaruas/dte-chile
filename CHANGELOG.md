@@ -1,5 +1,10 @@
 # Cambios
 
+## [Sin publicar]
+
+### Documentación
+- README: diagrama del flujo de emisión de un documento.
+
 ## 0.4.0 — 2026-10
 - **Folios en su base de datos:** `PdoFolios` (PHP, cualquier base con PDO) y `DbFolios` (C#, cualquier `DbConnection`). Reserva cada folio con una actualización condicional, sin bloqueos largos, así dos servidores nunca entregan el mismo folio.
 - **Logotipo en el PDF** (JPEG): opción `logo` / `OpcionesPdf.Logo`; se ubica arriba a la izquierda sin deformarse.

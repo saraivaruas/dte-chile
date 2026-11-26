@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 230" width="960" height="230" role="img" aria-label="Flujo: datos del documento, XML y totales, timbre con CAF, firma XMLDSig y envío al SII" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+<rect width="960" height="230" rx="12" fill="#ffffff" stroke="#d0d7de"/>
+<text x="20" y="36" font-size="19" font-weight="700" fill="#1f2328">De los datos al SII</text>
+<rect x="20.0" y="58" width="166.4" height="112" rx="10" fill="#eef5fd" stroke="#4592db"/>
+<text x="103.2" y="94" text-anchor="middle" font-size="15" font-weight="700" fill="#0b4a86">Datos</text>
+<text x="103.2" y="123" text-anchor="middle" font-size="13" font-weight="400" fill="#1f2328">documento, emisor</text>
+<text x="103.2" y="143" text-anchor="middle" font-size="13" font-weight="400" fill="#1f2328">y receptor</text>
+<path d="M190.4 114 h12 m-5 -5 l5 5 l-5 5" fill="none" stroke="#4592db" stroke-width="2"/>
+<rect x="208.4" y="58" width="166.4" height="112" rx="10" fill="#eef5fd" stroke="#4592db"/>
+<text x="291.6" y="94" text-anchor="middle" font-size="15" font-weight="700" fill="#0b4a86">XML y totales</text>
+<text x="291.6" y="123" text-anchor="middle" font-size="13" font-weight="400" fill="#1f2328">según los esquemas</text>
+<text x="291.6" y="143" text-anchor="middle" font-size="13" font-weight="400" fill="#1f2328">oficiales</text>
+<path d="M378.8 114 h12 m-5 -5 l5 5 l-5 5" fill="none" stroke="#4592db" stroke-width="2"/>
+<rect x="396.8" y="58" width="166.4" height="112" rx="10" fill="#eef5fd" stroke="#4592db"/>
+<text x="480.0" y="94" text-anchor="middle" font-size="15" font-weight="700" fill="#0b4a86">Timbre (TED)</text>
+<text x="480.0" y="123" text-anchor="middle" font-size="13" font-weight="400" fill="#1f2328">firmado con</text>
+<text x="480.0" y="143" text-anchor="middle" font-size="13" font-weight="400" fill="#1f2328">el CAF</text>
+<path d="M567.2 114 h12 m-5 -5 l5 5 l-5 5" fill="none" stroke="#4592db" stroke-width="2"/>
+<rect x="585.2" y="58" width="166.4" height="112" rx="10" fill="#eef5fd" stroke="#4592db"/>
+<text x="668.4" y="94" text-anchor="middle" font-size="15" font-weight="700" fill="#0b4a86">Firma</text>
+<text x="668.4" y="123" text-anchor="middle" font-size="13" font-weight="400" fill="#1f2328">XMLDSig del</text>
+<text x="668.4" y="143" text-anchor="middle" font-size="13" font-weight="400" fill="#1f2328">documento y envío</text>
+<path d="M755.6 114 h12 m-5 -5 l5 5 l-5 5" fill="none" stroke="#4592db" stroke-width="2"/>
+<rect x="773.6" y="58" width="166.4" height="112" rx="10" fill="#eef5fd" stroke="#4592db"/>
+<text x="856.8" y="94" text-anchor="middle" font-size="15" font-weight="700" fill="#0b4a86">Envío al SII</text>
+<text x="856.8" y="123" text-anchor="middle" font-size="13" font-weight="400" fill="#1f2328">y consulta</text>
+<text x="856.8" y="143" text-anchor="middle" font-size="13" font-weight="400" fill="#1f2328">de estado</text>
+<text x="20" y="204" font-size="13" fill="#57606a">Cumplir el esquema no garantiza que el SII acepte el documento. El envío con folios (CAF) reales aún no está probado.</text></svg>
